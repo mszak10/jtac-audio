@@ -1,0 +1,1 @@
+{"root":["./src/background/background.ts","./src/offscreen/offscreen.ts","./src/popup/popup.tsx","./src/popup/main.tsx","./src/popup/components/routingcontrol.tsx","./src/shared/messages.ts","./src/shared/routing.test.ts","./src/shared/routing.ts","./src/shared/types.ts"],"version":"5.9.3"}
