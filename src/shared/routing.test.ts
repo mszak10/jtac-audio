@@ -6,6 +6,7 @@ import {
   getMode,
   isRoutingMode,
   nextMode,
+  requiresCapture,
   setMode,
 } from './routing';
 
@@ -73,6 +74,27 @@ describe('state map', () => {
     expect(clearTab(store, 1)).toBe(true);
     expect(store.has(1)).toBe(false);
     expect(clearTab(store, 1)).toBe(false);
+  });
+
+  it('requiresCapture is false for stereo target regardless of current state', () => {
+    const s = createStateMap();
+    expect(requiresCapture(s, 1, 'stereo')).toBe(false);
+    setMode(s, 1, 'left');
+    expect(requiresCapture(s, 1, 'stereo')).toBe(false);
+  });
+
+  it('requiresCapture is true when going from stereo to a channel mode', () => {
+    const s = createStateMap();
+    expect(requiresCapture(s, 1, 'left')).toBe(true);
+    expect(requiresCapture(s, 1, 'right')).toBe(true);
+  });
+
+  it('requiresCapture is false when switching between non-stereo modes (the bug)', () => {
+    const s = createStateMap();
+    setMode(s, 1, 'left');
+    expect(requiresCapture(s, 1, 'right')).toBe(false);
+    setMode(s, 1, 'right');
+    expect(requiresCapture(s, 1, 'left')).toBe(false);
   });
 
   it('preserves metadata on the returned state', () => {

@@ -3,6 +3,7 @@ import {
   createStateMap,
   getMode,
   isRoutingMode,
+  requiresCapture,
   setMode,
 } from '../shared/routing';
 import type { Message, MessageResponse } from '../shared/messages';
@@ -68,6 +69,17 @@ async function applyRouting(
       .sendMessage({ type: 'SET_ROUTING', tabId, mode: 'stereo' } satisfies Message)
       .catch(() => undefined);
     return { ok: true, mode: 'stereo' };
+  }
+
+  // Switching between non-stereo modes reuses the existing capture pipeline
+  // — only the channel gains change. Calling getMediaStreamId again on an
+  // already-captured tab fails and would otherwise revert the popup to stereo.
+  if (!requiresCapture(store, tabId, mode)) {
+    setMode(store, tabId, mode, { tabTitle: tab.title, url: tab.url });
+    await chrome.runtime
+      .sendMessage({ type: 'SET_ROUTING', tabId, mode } satisfies Message)
+      .catch(() => undefined);
+    return { ok: true, mode };
   }
 
   try {

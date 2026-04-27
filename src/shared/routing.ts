@@ -59,3 +59,15 @@ export function clearTab(
 ): boolean {
   return store.delete(tabId);
 }
+
+// True when applying `target` to `tabId` needs a fresh chrome.tabCapture call.
+// Stereo never captures. Going stereo → left/right captures. Switching
+// between left and right reuses the existing pipeline (just flips gains).
+export function requiresCapture(
+  store: Map<TabId, RoutingState>,
+  tabId: TabId,
+  target: RoutingMode,
+): boolean {
+  if (target === 'stereo') return false;
+  return getMode(store, tabId) === 'stereo';
+}
